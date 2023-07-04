@@ -9,8 +9,8 @@ function [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilter(A,G,Q,R,S,y,x0,P_0_
 % Inputs:
 % A: state matrix
 % G: output matrix
-% Q: output noise covariance
-% R: state noise covariance
+% Q: state noise covariance
+% R: output noise covariance
 % S: mixed noise covariance
 % y: output vector
 % x0: initial state estimate
