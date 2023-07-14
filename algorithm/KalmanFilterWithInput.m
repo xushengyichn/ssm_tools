@@ -54,7 +54,7 @@ end
 if isempty(x0)
     x0=zeros(ns,1);
 end
-
+nx=2;%Shengyi added this line temporarily
 x_hat_k_kmin=zeros(nx,nt);
 x_hat_k_k=zeros(nx,nt);
 e_k=zeros(ny,nt);
