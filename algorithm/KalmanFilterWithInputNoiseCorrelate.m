@@ -13,7 +13,7 @@ function [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInputNoiseCorrelate(A,B
 %% Kalman filter
 %
 % Model:
-% x(k+1)=A*x(k)+B*u(k)+w(k);
+% x(k+1)=A*x(k)+B*p(k)+w(k);
 % y=G*x(k)+J*p(k)+v(k);
 %
 % Inputs:
