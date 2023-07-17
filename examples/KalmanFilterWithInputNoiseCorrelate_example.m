@@ -2,9 +2,9 @@
 %Author: ShengyiXu xushengyichn@outlook.com
 %Date: 2023-07-15 11:37:02
 %LastEditors: ShengyiXu xushengyichn@outlook.com
-%LastEditTime: 2023-07-15 11:39:38
-%FilePath: \ssm_tools\examples\KalmanFilterOneInput_example.m
-%Description: track the state of a spring-mass system with Kalman filter
+%LastEditTime: 2023-07-17 13:57:39
+%FilePath: \ssm_tools\examples\KalmanFilterWithInputNoiseCorrelate_example.m
+%Description: 
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -59,7 +59,8 @@ T = 25;
 t = 0:dt:T;
 
 [A, B, H, ~ ,~]=ssmod_c2d(Ac,Bc,Hc,[],dt);
-
+J = 0;
+S = ones(2,1)*0.01;
 % initial the input and output
 N=length(t);
 
@@ -76,10 +77,14 @@ for k1=1:N
     x00=x(:,k1);
 end
 
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterOneInput(A,B,H,Q,R,z,u,x0,P_0_0);
-
-
-
+% [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterOneInput(A,B,H,Q,R,z,u,x0,P_0_0);
+y=z;
+p_det=u;
+% [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilterWithInput(A,B,H,J,Q,R,S,y,p_det,x0,P_0_0,'nx',2);
+p=u;
+G=H;
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInputNoiseCorrelate(A,B,G,J,Q,R,S,y,p,x0,P_0_0);
+% [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInput_shengyi(A,B,G,J,Q,R,y,p,x0,P_0_0)
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);

@@ -1,3 +1,13 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Author: ShengyiXu xushengyichn@outlook.com
+%Date: 2023-07-15 11:37:02
+%LastEditors: ShengyiXu xushengyichn@outlook.com
+%LastEditTime: 2023-07-15 11:38:11
+%FilePath: \ssm_tools\examples\KalmanFilterNoInput_example.m
+%Description: track the state of a spring-mass system with Kalman filter
+%
+%Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% initial the problem
 % image a spring-mass system
@@ -15,7 +25,9 @@
 % initialization
 clc; clear; close all;
 addpath(genpath("D:\Users\xushe\Documents\GitHub\ssm_tools"))
+addpath(genpath("F:\git\ssm_tools"))
 addpath(genpath("D:\Users\xushe\Documents\GitHub\Function_shengyi_package"))
+addpath(genpath("F:\git\Function_shengyi_package"))
 subStreamNumberDefault = 2132;
 run('InitScript.m');
 
@@ -70,7 +82,6 @@ end
 
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
-hFigure = figure('Position', figPos_temp);
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
 hold on
 plot(t, z(1,:),  'Color', 'g','LineWidth', lineWidthThin);
@@ -81,11 +92,11 @@ legend('real','measure','filter')
 
 
 
-
 function [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images)
     figureIdx=figureIdx+1;
     row_idx = floor((figureIdx - 1) / num_figs_in_row);
     col_idx = mod((figureIdx - 1), num_figs_in_row);
     figPos_temp = figPos;
     figPos_temp(1:2) = figPos(1:2) + [col_idx * (figPos(3) + gap_between_images(1)) row_idx * (figPos(4) + gap_between_images(2))];
+    hFigure = figure('Position', figPos_temp);
 end

@@ -33,7 +33,7 @@ for k1 =1:N
     P_k_kmin(:,:,k1)=P_;
     %% Correction
     Kk=P_*H.'/(H*P_*H.'+R);
-    x=x_+Kk*(z(k1)-H*x_);
+    x=x_+Kk*(z(:,k1)-H*x_);
 
     x_k_k(:,k1)=x;
     %% Update

@@ -15,7 +15,9 @@
 % initialization
 clc; clear; close all;
 addpath(genpath("D:\Users\xushe\Documents\GitHub\ssm_tools"))
+addpath(genpath("F:\git\ssm_tools"))
 addpath(genpath("D:\Users\xushe\Documents\GitHub\Function_shengyi_package"))
+addpath(genpath("F:\git\Function_shengyi_package"))
 subStreamNumberDefault = 2132;
 run('InitScript.m');
 
@@ -65,7 +67,7 @@ end
 
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
-hFigure = figure('Position', figPos_temp);
+
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
 hold on
 plot(t, z(1,:),  'Color', 'g','LineWidth', lineWidthThin);
@@ -83,4 +85,5 @@ function [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figP
     col_idx = mod((figureIdx - 1), num_figs_in_row);
     figPos_temp = figPos;
     figPos_temp(1:2) = figPos(1:2) + [col_idx * (figPos(3) + gap_between_images(1)) row_idx * (figPos(4) + gap_between_images(2))];
+    hFigure = figure('Position', figPos_temp);
 end
