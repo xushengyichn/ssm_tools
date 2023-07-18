@@ -46,11 +46,15 @@ omega0=2*pi*f;
 m = 1;
 F = 100;
 zeta=0.1;
+k = m*omega0^2;
+c=2*zeta*omega0*m;
 Ac=[0 1;-omega0^2 -2*zeta*omega0];
 Bc=[0;1];
-Hc=[1 0];
-Q=0.1*eye(2);
-R=2;
+Hc=[1,0;0,1;-k/m,-c/m];
+Jc=[0;0;1/m];
+
+Q=1*eye(2);
+R=2*eye(3);
 P_0_0=eye(2);
 x0=[0;0];
 
@@ -58,8 +62,8 @@ dt = 0.01;
 T = 25;
 t = 0:dt:T;
 
-[A, B, H, ~ ,~]=ssmod_c2d(Ac,Bc,Hc,[],dt);
-J = 0;
+[A, B, H, J ,~]=ssmod_c2d(Ac,Bc,Hc,Jc,dt);
+% J = 0;
 S = zeros(2,1);
 % initial the input and output
 N=length(t);
@@ -67,13 +71,13 @@ N=length(t);
 Ft=F*sin(2*pi*f*t);
 u=Ft/m;
 x=zeros(2,N);
-z=zeros(1,N);
+z=zeros(3,N);
 w = sqrt(Q)*randn(2,N);
-v = sqrt(R)*randn(1,N);
+v = sqrt(R)*randn(3,N);
 x00= x0;
 for k1=1:N
     x(:,k1)=A*x00+B*u(k1)+w(:,k1);
-    z(k1)=H*x(:,k1)+v(k1);
+    z(:,k1)=H*x(:,k1)+J*u(k1)+v(k1);
     x00=x(:,k1);
 end
 

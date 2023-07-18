@@ -17,7 +17,7 @@
 % X'=AX+Bu
 % Z=HX
 % A=[0 1;-omega0^2 -2*zeta*omega0]
-% B=[0;omega0^2]
+% B=[0;1]
 % H=[1 0]
 % u=F/m
 
@@ -41,25 +41,25 @@ gap_between_images = [0,0];
 figureIdx = 0;
 
 % initial the parameters
-f=1;
+f=0.1;
 omega0=2*pi*f;
 m = 1;
-F = 2;
+F = 10;
 zeta=0.1;
 Ac=[0 1;-omega0^2 -2*zeta*omega0];
-Bc=[0;omega0^2];
-Hc=[1 0];
+Bc=[0;1];
+Hc=[1,0;0,1];
 Q=0.001*eye(2);
-R=2;
+R=0.2;
 P_0_0=eye(2);
 x0=[0;0];
 
 dt = 0.01;
-T = 25;
+T = 100;
 t = 0:dt:T;
 
 [A, B, H, ~ ,~]=ssmod_c2d(Ac,Bc,Hc,[],dt);
-J = 0;
+J = zeros(2,1);
 S = ones(1,1)*0.01;
 % initial the input and output
 N=length(t);
@@ -67,13 +67,13 @@ N=length(t);
 Ft=F*sin(2*pi*f*t);
 u=Ft/m;
 x=zeros(2,N);
-z=zeros(1,N);
+z=zeros(2,N);
 w = sqrt(Q)*randn(2,N);
-v = sqrt(R)*randn(1,N);
+v = sqrt(R)*randn(2,N);
 x00= x0;
 for k1=1:N
     x(:,k1)=A*x00+B*u(k1)+w(:,k1);
-    z(k1)=H*x(:,k1)+v(k1);
+    z(:,k1)=H*x(:,k1)+v(:,k1);
     x00=x(:,k1);
 end
 

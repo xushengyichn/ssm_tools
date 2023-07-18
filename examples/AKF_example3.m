@@ -4,7 +4,7 @@
 %LastEditors: ShengyiXu xushengyichn@outlook.com
 %LastEditTime: 2023-07-17 19:09:57
 %FilePath: \ssm_tools\examples\AKF_example2.m
-%Description: 
+%Description: case in Øyvind's slide
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -261,8 +261,13 @@ end
 for k1 = 1:2
 
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
-plot(t,p(1,:),'r')
-
+plot(t,p(1,:),'r');
+hold on
+plot(t,p_history(1,:),'b','Linestyle','--');
+xlabel('time(s)');
+ylabel('Force(N)');
+legend(["p"+num2str(k1)+"_{true}"],"p"+num2str(k1)+"_{predit}")
+end
 
 function [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images)
     figureIdx=figureIdx+1;

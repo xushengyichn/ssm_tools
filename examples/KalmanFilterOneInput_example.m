@@ -17,7 +17,7 @@
 % X'=AX+Bu
 % Z=HX
 % A=[0 1;-omega0^2 -2*zeta*omega0]
-% B=[0;omega0^2]
+% B=[0;1]
 % H=[1 0]
 % u=F/m
 
@@ -44,10 +44,10 @@ figureIdx = 0;
 f=1;
 omega0=2*pi*f;
 m = 1;
-F = 2;
+F = 50;
 zeta=0.1;
 Ac=[0 1;-omega0^2 -2*zeta*omega0];
-Bc=[0;omega0^2];
+Bc=[0;1];
 Hc=[1 0];
 Q=0.1*eye(2);
 R=2;
