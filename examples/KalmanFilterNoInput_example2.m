@@ -75,7 +75,22 @@ plot(t, x_k_k(1,:),  'Color', 'b','LineWidth', lineWidthThin);
 xlabel('time (s)')
 ylabel('displacement (m)')
 legend('real','measure','filter')
+title("估计值")
 
+[figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
+
+plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
+title("真实值")
+xlabel('time (s)')
+ylabel('displacement (m)')
+legend('real')
+
+[figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
+plot(t, z(1,:),  'Color', 'g','LineWidth', lineWidthThin);
+title("测量值")
+xlabel('time (s)')
+ylabel('displacement (m)')
+legend('measure')
 
 
 

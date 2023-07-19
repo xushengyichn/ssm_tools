@@ -82,13 +82,15 @@ end
 
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
-plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
+
+
+plot(t, z(1,:),  'Color', 'g','LineWidth', lineWidthNormal);
 hold on
-plot(t, z(1,:),  'Color', 'g','LineWidth', lineWidthThin);
-plot(t, x_k_k(1,:),  'Color', 'b','LineWidth', lineWidthThin);
+plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthNormal);
+plot(t, x_k_k(1,:),  'Color', 'b','LineWidth', lineWidthNormal,'LineStyle','-.');
 xlabel('time (s)')
 ylabel('displacement (m)')
-legend('real','measure','filter')
+legend('measure','real','filter')
 
 
 

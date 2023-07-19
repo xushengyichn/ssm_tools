@@ -44,7 +44,7 @@ figureIdx = 0;
 f=3;
 omega0=2*pi*f;
 m = 1;
-F = 100;
+F = 25;
 zeta=0.1;
 k = m*omega0^2;
 c=2*zeta*omega0*m;
@@ -53,7 +53,7 @@ Bc=[0;1];
 Hc=[1,0;0,1;-k/m,-c/m];
 Jc=[0;0;1/m];
 Q=0.00001*eye(2);
-R=0.1*eye(3);
+R=0.01*eye(3);
 P_0_0=eye(2);
 x0=[0;0];
 
