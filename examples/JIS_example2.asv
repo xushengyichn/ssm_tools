@@ -4,7 +4,7 @@
 %LastEditors: ShengyiXu xushengyichn@outlook.com
 %LastEditTime: 2023-07-17 18:47:46
 %FilePath: \ssm_tools\examples\AKF_example.m
-%Description: add the Accelerometer information compared with AKF_example
+%Description: 
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -17,7 +17,7 @@
 % X'=AX+Bu
 % Z=HX
 % A=[0 1;-omega0^2 -2*zeta*omega0]
-% B=[0;1]
+% B=[0;omega0^2]
 % H=[1 0]
 % u=F/m
 
@@ -50,7 +50,7 @@ k = m*omega0^2;
 c=2*zeta*omega0*m;
 Ac=[0 1;-omega0^2 -2*zeta*omega0];
 Bc=[0;1];
-Hc=[1,0;0,1;-k/m,-c/m];
+Hc=[1,0;-k/m,-c/m];
 Jc=[0;0;1/m];
 Q=0.001*eye(2);
 R=0.02*eye(3);
@@ -62,12 +62,13 @@ T = 100;
 t = 0:dt:T;
 
 [A, B, H, J ,~]=ssmod_c2d(Ac,Bc,Hc,Jc,dt);
-% J = zeros(2,1);
-S = ones(1,1)*0.5;
+
+% S = ones(1,1)*0.01;
 % initial the input and output
 N=length(t);
 
 Ft=F*sin(2*pi*f*t);
+
 u=Ft;
 x=zeros(2,N);
 z=zeros(3,N);
@@ -76,7 +77,7 @@ v = sqrt(R)*randn(3,N);
 x00= x0;
 for k1=1:N
     x(:,k1)=A*x00+B*u(k1)+w(:,k1);
-    z(:,k1)=H*x(:,k1)+J*u(k1)+v(:,k1);
+    z(:,k1)=H*x(:,k1)+v(:,k1);
     x00=x(:,k1);
 end
 
@@ -87,7 +88,12 @@ np=size(Ft,1);
 Pp_0_0=eye(np)*1;
 p0 = zeros(np,1);
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInput_shengyi(A,B,G,J,Q,R,y,p,x0,P_0_0)
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=AKF(A,B,G,J,Q,R,S,y,x0,p0,P_0_0,Pp_0_0);
+% [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=AKF(A,B,G,J,Q,R,S,y,x0,p0,P_0_0,Pp_0_0);
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin,p_k_k,Pp_k_k]=JIS(A,B,G,J,Q,R,y,x0,P_0_0);
+% S=zeros(2,3);
+% P01=P_0_0;
+% [x_k_k p_k_k P_ss Pp_ss M_ss L_ss]=JIS_ss(A,B,G,J,y,x0,Q,R,S,P01)
+
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
@@ -101,7 +107,7 @@ legend('real','measure','filter')
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 plot(t, Ft,  'Color', 'r','LineWidth', lineWidthThin);
 hold on
-plot(t, x_k_k(end,:),  'Color', 'b','LineWidth', lineWidthThin);
+plot(t, p_k_k,  'Color', 'b','LineWidth', lineWidthThin);
 
 xlabel('time (s)')
 ylabel('Force (N)')

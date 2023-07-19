@@ -41,24 +41,26 @@ gap_between_images = [0,0];
 figureIdx = 0;
 
 % initial the parameters
-f=1;
+f=0.1;
 omega0=2*pi*f;
 m = 1;
-F = 20;
+F = 10;
 zeta=0.1;
 k = m*omega0^2;
 c=2*zeta*omega0*m;
 Ac=[0 1;-omega0^2 -2*zeta*omega0];
-Bc=[0;omega0^2];
-Hc=[1,0;0,1;-k/m,-c/m];
-Jc=[0;0;1/m];
+Bc=[0;1];
+Hc=[1,0;0,1];
 Q=0.001*eye(2);
-R=0.02;
+R=0.2*eye(2);
 P_0_0=eye(2);
 x0=[0;0];
 
+
+
+
 dt = 0.01;
-T = 25;
+T = 100;
 t = 0:dt:T;
 
 [A, B, H, J  ,~]=ssmod_c2d(Ac,Bc,Hc,Jc,dt);
@@ -68,7 +70,7 @@ t = 0:dt:T;
 N=length(t);
 
 Ft=F*sin(2*pi*f*t);
-u=Ft/m;
+u=Ft;
 x=zeros(2,N);
 z=zeros(3,N);
 w = sqrt(Q)*randn(2,N);
