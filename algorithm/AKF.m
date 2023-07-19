@@ -2,7 +2,7 @@
 %Author: ShengyiXu xushengyichn@outlook.com
 %Date: 2023-07-15 12:44:21
 %LastEditors: ShengyiXu xushengyichn@outlook.com
-%LastEditTime: 2023-07-17 18:37:33
+%LastEditTime: 2023-07-19 14:54:39
 %FilePath: \ssm_tools\algorithm\AKF.m
 %Description: based on Lourens, E., et al. "An augmented Kalman filter for force identification in structural dynamics." Mechanical systems and signal processing 27 (2012): 446-460.
 %
@@ -47,43 +47,26 @@ Q_a = [Q,zeros(ns,np);zeros(np,ns),S];
 x=[x0;p0];
 P_0_0 = [P_0_0,zeros(ns,np);zeros(np,ns),Pp_0_0];
 P_k = P_0_0;
-for k1 =1:N
-    %% Prediction
-    x_=A_a*x;
-    P_=A_a*P_k*A_a.'+Q_a;
-
-    x_k_kmin(:,k1)=x_;
-    P_k_kmin(:,:,k1)=P_;
-    %% Correction
-    Kk=P_*G_a.'/(G_a*P_*G_a.'+R);
-    x=x_+Kk*(y(:,k1)-G_a*x_);
-
-    x_k_k(:,k1)=x;
-    %% Update
-    P_k=forcesym((eye(size(A_a))-Kk*G_a)*P_);
-    P_k_k(:,:,k1)=P_k;
-
-end
-
-% P_ =P_0_0;
-% x_ = x;
 % for k1 =1:N
-%     %% measurement update
-%     Kk=P_*G_a.'/(G_a*P_*G_a.'+R);
-%     x=x_+Kk*(y(:,k1)-G_a*x_);
-%     P_k=forcesym((eye(size(A_a))-Kk*G_a)*P_);
-%     x_k_k(:,k1)=x;    
-%     P_k_k(:,:,k1)=P_k;
-% 
-%     % time update
+%     %% Prediction
 %     x_=A_a*x;
 %     P_=A_a*P_k*A_a.'+Q_a;
-% 
+
 %     x_k_kmin(:,k1)=x_;
 %     P_k_kmin(:,:,k1)=P_;
-% 
-% 
+%     %% Correction
+%     Kk=P_*G_a.'/(G_a*P_*G_a.'+R);
+%     x=x_+Kk*(y(:,k1)-G_a*x_);
+
+%     x_k_k(:,k1)=x;
+%     %% Update
+%     P_k=forcesym((eye(size(A_a))-Kk*G_a)*P_);
+%     P_k_k(:,:,k1)=P_k;
+
 % end
+
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A_a,G_a,Q_a,R,y,x,P_k);
+
 
 
 end

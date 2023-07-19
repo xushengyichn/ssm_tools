@@ -24,10 +24,11 @@ function [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0)
 
 N = size(z,2);
 x=x0;
+P_k=P_0_0;
 for k1 =1:N
     %% Prediction
     x_=A*x;
-    P_=A*P_0_0*A.'+Q;
+    P_=A*P_k*A.'+Q;
 
     x_k_kmin(:,k1)=x_;
     P_k_kmin(:,:,k1)=P_;

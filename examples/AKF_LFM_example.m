@@ -17,7 +17,7 @@
 % X'=AX+Bu
 % Z=HX
 % A=[0 1;-omega0^2 -2*zeta*omega0]
-% B=[0;omega0^2]
+% B=[0;1]
 % H=[1 0]
 % u=F/m
 
@@ -46,14 +46,11 @@ omega0=2*pi*f;
 m = 1;
 F = 10;
 zeta=0.1;
-k = m*omega0^2;
-c=2*zeta*omega0*m;
 Ac=[0 1;-omega0^2 -2*zeta*omega0];
 Bc=[0;1];
-Hc=[1,0;-k/m,-c/m];
-Jc=[0;0;1/m];
+Hc=[1,0;0,1];
 Q=0.001*eye(2);
-R=0.02*eye(3);
+R=0.2;
 P_0_0=eye(2);
 x0=[0;0];
 
@@ -61,19 +58,18 @@ dt = 0.01;
 T = 100;
 t = 0:dt:T;
 
-[A, B, H, J ,~]=ssmod_c2d(Ac,Bc,Hc,Jc,dt);
-
-% S = ones(1,1)*0.01;
+[A, B, H, ~ ,~]=ssmod_c2d(Ac,Bc,Hc,[],dt);
+J = zeros(2,1);
+S = ones(1,1)*0.01;
 % initial the input and output
 N=length(t);
 
 Ft=F*sin(2*pi*f*t);
-
-u=Ft;
+u=Ft/m;
 x=zeros(2,N);
-z=zeros(3,N);
+z=zeros(2,N);
 w = sqrt(Q)*randn(2,N);
-v = sqrt(R)*randn(3,N);
+v = sqrt(R)*randn(2,N);
 x00= x0;
 for k1=1:N
     x(:,k1)=A*x00+B*u(k1)+w(:,k1);
@@ -88,12 +84,7 @@ np=size(Ft,1);
 Pp_0_0=eye(np)*1;
 p0 = zeros(np,1);
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInput_shengyi(A,B,G,J,Q,R,y,p,x0,P_0_0)
-% [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=AKF(A,B,G,J,Q,R,S,y,x0,p0,P_0_0,Pp_0_0);
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin,p_k_k,Pp_k_k]=JIS(A,B,G,J,Q,R,y,x0,P_0_0);
-% S=zeros(2,3);
-% P01=P_0_0;
-% [x_k_k p_k_k P_ss Pp_ss M_ss L_ss]=JIS_ss(A,B,G,J,y,x0,Q,R,S,P01)
-
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=AKF(A,B,G,J,Q,R,S,y,x0,p0,P_0_0,Pp_0_0);
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
@@ -107,7 +98,7 @@ legend('real','measure','filter')
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 plot(t, Ft,  'Color', 'r','LineWidth', lineWidthThin);
 hold on
-plot(t, p_k_k,  'Color', 'b','LineWidth', lineWidthThin);
+plot(t, x_k_k(end,:),  'Color', 'b','LineWidth', lineWidthThin);
 
 xlabel('time (s)')
 ylabel('Force (N)')
