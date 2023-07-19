@@ -41,7 +41,7 @@ gap_between_images = [0,0];
 figureIdx = 0;
 
 % initial the parameters
-f=0.1;
+f=0.5;
 omega0=2*pi*f;
 m = 1;
 F = 10;
@@ -52,6 +52,16 @@ Ac=[0 1;-omega0^2 -2*zeta*omega0];
 Bc=[0;1];
 Gc=[1,0;0,1;-k/m,-c/m];
 Jc=[0;0;1/m];
+
+% 
+% Gc=[1,0;-k/m,-c/m];
+% Jc=[0;1/m];
+
+
+% Gc=[-k/m,-c/m];
+% Jc=[1/m];
+
+
 Q=0.001*eye(2);
 Qxd=Q;
 
@@ -64,10 +74,11 @@ t = 0:dt:T;
 
 %% LFM model
 % Choose the matern kernel
-lambda =0.01;
-p_order = 0;
-sigma_p = 10;
-[Fc,Lc,Hc,sigma_w]=ssmod_matern(lambda,p_order,sigma_p);
+lambda =0.1;
+% p_order = 0;
+sigma_p = 100;
+% [Fc,Lc,Hc,sigma_w]=ssmod_matern(lambda,p_order,sigma_p);
+[Fc, Lc, Hc, sigma_w] =ssmod_quasiperiod(lambda, sigma_p, omega0);
 [Fac,Bac,Hac,Jac,Fad,Bad,Had,Jad,Qad]=ssmod_lfm_aug(Ac,Bc,Gc,Jc,Fc,Hc,Lc,Qxd,sigma_w,dt);
 
 nx=size(Ac,1);
@@ -91,10 +102,10 @@ u=Ft;
 x=zeros(2,N);
 z=zeros(nmeasure,N);
 w = sqrt(Q)*randn(2,N);
-v1 = sqrt(RR)*randn(2,N);
-v2 = sqrt(RR)*randn(1,N);
-v=[v1;v2]
-% v = sqrt(R)*randn(nmeasure,N);
+% v1 = sqrt(RR)*randn(2,N);
+% v2 = sqrt(RR)*randn(1,N);
+% v=[v1;v2];
+v = sqrt(R)*randn(nmeasure,N);
 x00= x0;
 for k1=1:N
     x(:,k1)=A*x00+B*u(k1)+w(:,k1);
