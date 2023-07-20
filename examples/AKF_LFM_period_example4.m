@@ -24,7 +24,7 @@ run('InitScript.m');
 
 %% 0 绘图参数
 fig_bool = ON;
-num_figs_in_row = 4; %每一行显示几个图
+num_figs_in_row = 8; %每一行显示几个图
 figPos = figPosSmall; %图的大小，参数基于InitScript.m中的设置
 %设置图片间隔
 gap_between_images = [0,0];
@@ -218,7 +218,7 @@ P_0_0=eye(nx+nsp);
 xa0=[x0;zeros(nsp,1)];
 [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(Fad,Had,Qad,Rad,yn,xa0,P_0_0);
 
-
+[x_k_N,P_k_N]=RTSFixedInterval(Fad,x_k_k,x_k_kmin,P_k_k,P_k_kmin);
 
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=AKF(A_d,B_d,G_d,J_d,Q,R,SS,yn,x0,p0,P_0_0,Pp_0_0);
 xa_history=x_k_k;
@@ -226,7 +226,15 @@ pa_history=P_k_k;
 x_history = [phi zeros(4,nmodes); zeros(4,nmodes) phi]*xa_history(1:ns,:);
 Px_history = abs([phi zeros(4,nmodes); zeros(4,nmodes) phi])*pa_history(1:ns,:);
 p_history = xa_history(ns+1,:);
-Pp_history = pa_history(ns+1,:);
+Pp_history = pa_history(ns+1,ns+1,:);
+
+
+xa_history_smoothing=x_k_N;
+pa_history_smoothing=P_k_N;
+x_history_smoothing = [phi zeros(4,nmodes); zeros(4,nmodes) phi]*xa_history_smoothing(1:ns,:);
+Px_history_smoothing = abs([phi zeros(4,nmodes); zeros(4,nmodes) phi])*pa_history_smoothing(1:ns,:);
+p_history_smoothing = xa_history_smoothing(ns+1,:);
+Pp_history_smoothing = pa_history_smoothing(ns+1,ns+1,:);
 
 
 for k1 =1:4
@@ -235,9 +243,10 @@ for k1 =1:4
 plot(t,x_true(k1,:),'r');
 hold on
 plot(t,x_history(k1,:),'b','Linestyle','--');
+plot(t,x_history_smoothing(k1,:),'g','Linestyle','-.');
 xlabel('time (s)')
 ylabel('displacement (m)')
-legend(["u"+num2str(k1)+"_{true}"],"u"+num2str(k1)+"_{predit}")
+legend("u"+num2str(k1)+"_{true}","u"+num2str(k1)+"_{predit}","u"+num2str(k1)+"_{smoothing}")
 end
 
 
@@ -247,9 +256,10 @@ for k1 =1:4
 plot(t,x_true(k1+4,:),'r');
 hold on
 plot(t,x_history(k1+4,:),'b','Linestyle','--');
+plot(t,x_history_smoothing(k1+4,:),'g','Linestyle','-.');
 xlabel('time (s)')
 ylabel('velocity (m/s)')
-legend(["u"+num2str(k1)+"_{true}"],"u"+num2str(k1)+"_{predit}")
+legend("u"+num2str(k1)+"_{true}","u"+num2str(k1)+"_{predit}","u"+num2str(k1)+"_{smoothing}")
 end
 
 for k1 = 1:1
@@ -258,9 +268,45 @@ for k1 = 1:1
 plot(t,p(1,:),'r');
 hold on
 plot(t,p_history(1,:),'b','Linestyle','--');
+plot(t,p_history_smoothing(1,:),'g','Linestyle','-.');
 xlabel('time(s)');
 ylabel('Force(N)');
-legend(["p"+num2str(k1)+"_{true}"],"p"+num2str(k1)+"_{predit}")
+legend("p"+num2str(k1)+"_{true}","p"+num2str(k1)+"_{predit}","p"+num2str(k1)+"_{smoothing}")
+end
+
+
+for k1 =1:4
+
+[figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
+plot(t,squeeze(P_k_k(k1,k1,:)),'b','Linestyle','--');
+hold on
+plot(t,squeeze(P_k_N(k1,k1,:)),'g','Linestyle','-.');
+xlabel('time (s)')
+ylabel('covariance')
+legend("u"+num2str(k1)+"_{filter}","u"+num2str(k1)+"_{smoothing}")
+end
+
+
+for k1 =1:4
+
+[figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
+plot(t,squeeze(P_k_k(k1+4,k1+4,:)),'b','Linestyle','--');
+hold on
+plot(t,squeeze(P_k_N(k1+4,k1+4,:)),'g','Linestyle','-.');
+xlabel('time (s)')
+ylabel('covariance')
+legend("u"+num2str(k1)+"_{filter}","u"+num2str(k1)+"_{smoothing}")
+end
+
+for k1 = 1:1
+
+[figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
+plot(t,squeeze(Pp_history),'b','Linestyle','--');
+hold on
+plot(t,squeeze(Pp_history_smoothing),'g','Linestyle','-.');
+xlabel('time(s)');
+ylabel('Force(N)');
+legend("p"+num2str(k1)+"_{predit}","p"+num2str(k1)+"_{smoothing}")
 end
 
 function [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images)
