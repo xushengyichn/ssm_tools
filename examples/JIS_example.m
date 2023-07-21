@@ -4,7 +4,7 @@
 %LastEditors: ShengyiXu xushengyichn@outlook.com
 %LastEditTime: 2023-07-17 18:47:46
 %FilePath: \ssm_tools\examples\AKF_example.m
-%Description: 
+%Description: Retuen error because JIS cannot run with not J
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
