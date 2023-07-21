@@ -43,7 +43,16 @@ ns2=size(Fc,1);
 
 nw=size(Lc,2);
 
-Sigma_w_squared=diag(sigma_w).^2;
+
+if isvector(sigma_w)
+    Sigma_w_squared=diag(sigma_w).^2;
+elseif ismatrix(sigma_w)
+    Sigma_w_squared=sigma_w.^2;
+else
+    Sigma_w_squared=sigma_w.^2;
+end
+
+
 
 Qwc=Lc*Sigma_w_squared*Lc.';
 Qxc=zeros(ns);
