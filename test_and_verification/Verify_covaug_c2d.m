@@ -9,7 +9,7 @@ close all
 rng(1);
 
 freq=[0.05 0.2]
-omega=diag([freq]);
+omega=diag(freq)*2*pi;
 gamma=2*omega*0.02
 
 dt=0.5;
@@ -24,7 +24,7 @@ Sp=[1 0.5].';
 [A B G J Ac Bc F]=ssmod_modal(phi,omega,gamma,Sa,Sd,Sp,dt,'force','modal');
 
 lambda=[0.1 0.01];
-Fc=-diag(lambda); 
+Fc=-diag(lambda);
 Hc=eye(2);
 Lc=eye(2);
 
@@ -34,7 +34,7 @@ Ac_aug=[Ac Bc*Hc ; zeros(2,4) Fc];
 %% Covariance for LFM
 
 Qcw=diag([3 2]);
-Qcw_aug=blockDiagonal(zeros(size(Ac)),Lc*Qcw*Lc.');
+Qcw_aug=blkdiag(zeros(size(Ac)),Lc*Qcw*Lc.');
 
 Qdw_aug=cov_c2d(Ac_aug,Qcw_aug,dt);
 Qdw_aug_approx=Qcw_aug*dt;
@@ -46,8 +46,6 @@ legend show
 ylog;
 
 plotcorr(Qdw_aug);
-
-% ratio=1./(Qw_aug(end,end)./diag(Qw_aug))
 
 %% Covariance for additional white noise excitation
 
@@ -70,17 +68,12 @@ tilefigs
 clc
 
 close all
-% figure(); 
-% % bar3z(Qe_aug); colorbar; colormap(brewermap(100,'GnBu'));
 XTickLabel={'x_1' 'x_2' 'x_3' 'x_4' 's_1' 's_2'};
-% YTickLabel={'x_1' 'x_2'};
 
 plotcovmatrix((Qdw_aug),XTickLabel,XTickLabel,'','');
-
 % plotscriptmain('h',6,'w',6,'name','Qw','path',cd,'labelsize',6,'ticksize',6,'legendsize',6,'titlesize',6,'box','on','format',{'jpg'});
 
 plotcovmatrix((Qde_aug),XTickLabel,XTickLabel,'','');
-
 % plotscriptmain('h',6,'w',6,'name','Qe','path',cd,'labelsize',6,'ticksize',6,'legendsize',6,'titlesize',6,'box','on','format',{'jpg'});
 
 tilefigs
@@ -89,19 +82,15 @@ tilefigs
 
 Ad_aug=expm(Ac_aug*dt);
 
-% Pa_inf= lyap(Ac_aug,Qcw_aug)
-% Qd_test=Pa_inf-Ad_aug*Pa_inf*Ad_aug.';
-
-
-%% Effect of dt
+%% Effect of dt on 
 
 dt_mat=10.^[-3:0.1:0];
 
 for k=1:length(dt_mat)
-    
-Qdw_aug=covarianceContToDisc(Ac_aug,Qcw_aug,dt_mat(k));
 
-ratio(k,:)=diag(Qdw_aug)
+    Qdw_aug=covarianceContToDisc(Ac_aug,Qcw_aug,dt_mat(k));
+
+    ratio(k,:)=diag(Qdw_aug)
 
 end
 
@@ -135,5 +124,3 @@ plotcovmatrix(ratio_e,XTickLabel,XTickLabel,'','');
 % plotscriptmain('h',6,'w',6,'name','Qe_ratio','path',cd,'labelsize',6,'ticksize',6,'legendsize',6,'titlesize',6,'box','on','format',{'jpg'});
 
 tilefigs
-
-%%

@@ -4,7 +4,7 @@ function [x_smooth p_smooth P_x_ss P_p_ss P_xp_ss P_px_ss]=JIS_smooth(A,B,G,J,y,
 %
 % Model
 % x(k+1)=A*x(k)+B*p(k)+w(k);
-% y=G*x(k)+J*p(k)+v(k);
+% y(k)=G*x(k)+J*p(k)+v(k);
 %
 % Inputs:
 % A: state matrix
@@ -82,7 +82,7 @@ end
 if isempty(P01)
     P01=100*eye(size(A,1));
 
-    [~,~,P01]=KalmanFilterWithInput(A,B,G,J,Q,R,S,y(:,1:min(100,nt)),zeros(np,min(100,nt)),[],[],'noscaling',false,'showtext','no');
+    [~,~,P01]=KalmanFilterWithInput(A,B,G,J,Q,R,S,y(:,1:min(100,nt)),zeros(np,min(100,nt)),[],[],'noscaling',false,'showtext',false);
 
     P01=P01+eye(size(P01))*min(diag(P01))*2;
     
@@ -527,9 +527,4 @@ C_stack=C(toeplitz_index);
 H = cell2mat(C_stack);
 
 end
-
-
-
-
-
 

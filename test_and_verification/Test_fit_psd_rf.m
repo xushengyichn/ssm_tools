@@ -1,11 +1,8 @@
-%%
-
-clc
-clear all
-close all
-
-%% 
+%% Verification of fit of state-space models for
+% for various parametric expressions
     
+%% Single modal spectrum (exact rf)
+
 clc
 clear all
 close all
@@ -23,7 +20,7 @@ S_target_twosided=S_target/2;
 
 % plotpsd(omega,S_target_twosided,S_ssmod_twosided,'xlim',[0 10]);
 
-%%
+%% Double modal spectrum (exponential)
     
 clc
 clear all
@@ -34,12 +31,14 @@ omega=[0.01:0.01:10];
 S_target(1,1,:)=20*exp(-0.5*(omega-2).^2/0.2^2)+10*exp(-0.5*(omega-4).^2/0.5^2);
 
 forcezero=true; order_n=6; order_d=8;
+forcezero=true; order_n=8; order_d=10;
+
 % forcezero=false; order_n=2; order_d=4;
-forcezero=true; order_n=14; order_d=18;
+% forcezero=true; order_n=14; order_d=18;
 [n_opt,d_opt,alpha_opt,S_opt,rn_opt,rd_opt]=fit_psd_rf(omega,S_target,order_n,order_d,'forcezero',forcezero);
 
 
-%%
+%% Single modal spectrum with time domain sim
 
 clc
 clear all
@@ -82,30 +81,9 @@ x0=zeros(size(Fd,1),1);
 
 [x,y]=ssmod_forward(Fd,Bd,Hd,Jd,[],x0,w);
 
-plotTime(t,y);
+plottime(t,y);
 
 [S_welch,f_welch]=estimateSpectrumWelch(y,1/dt,'Nwelch',100); w_welch=f_welch*2*pi; S_welch=S_welch/(2*pi);
 
 plotpsd(omega,S_target,omega,S_ssmod_twosided*2,w_welch,S_welch,'xlim',[0 10]);
 
-%%
-
-% clc
-% clear all
-% close all
-% 
-% omega=[0.01:0.01:10];
-% 
-% S_target(1,1,:)=KaimalSpectrum(omega,10,20,1,50);
-% 
-% % plotpsd(omega,S_target,'xlim',[0 10]);
-% 
-% % forcezero=true; order_n=2; order_d=6; n0=[1 0]; a0=[1 -3 2 5]; 
-% % [a_opt,n_opt,alpha_opt]=fit_psd_rf(omega,S_target,order_n,order_d,'n0',n0,'a0',a0);
-% 
-% forcezero=false; order_n=2; order_d=4;
-% [d_opt,n_opt,alpha_opt]=fit_psd_rf(omega,S_target,order_n,order_d,'forcezero',forcezero,'penaltylog',true);
-% 
-% tilefigs([2 2],'l');
-
-%%

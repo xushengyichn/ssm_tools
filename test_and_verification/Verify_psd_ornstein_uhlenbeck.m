@@ -1,27 +1,4 @@
-%% Test PSD of WN
-
-clc
-clear all
-close all
-
-dt=0.02
-
-t=[0:dt:100000];
-w_axis=[0:0.001:1/dt/2]*2*pi;
-
-sigma_wc_squared=8^2
-
-sigma_wd_squared=sigma_wc_squared*dt;
-
-w_sim=randn(size(t))*sigma_wd_squared.^0.5;
-
-[S_welch,w_welch]=estimateSpectrumWelch(w_sim,1/dt,'Nwelch',1000,'unit','rad');
-
-S_test(1,1,1:length(w_axis))=sigma_wc_squared/(2*pi);
-
-plotpsd(w_welch,S_welch,w_axis,S_test*2*dt^2,'xlim',[0 500]); % Still not quite sure why dt^2 is needed here, but ok
-
-%% Example: Ornstein Uhlenbeck subjected to WN
+%% Verification of Ornstein Uhlenbeck process
 
 clc
 clear all
@@ -56,7 +33,7 @@ S_y_ss_disc=mtimes3(H_ss_disc,S_eta_disc*dt,H_ss_disc,'nnh'); % Not quite sure w
 % Simulate in time
 w_sim=randn(size(t))*sigma_wd_squared.^0.5;
 [x_sim,y_sim]=ssmod_forward(A,B_sim,G,J,[],0,w_sim);
-plotTime(t,y_sim)
+plottime(t,y_sim)
 
 % From theory, see powerpoint
 S_theory(1,1,:)=(Bc*Gc)^2*sigma_wc_squared/(2*pi)./(lambda.^2+w_axis.^2);
@@ -64,11 +41,9 @@ S_theory(1,1,:)=(Bc*Gc)^2*sigma_wc_squared/(2*pi)./(lambda.^2+w_axis.^2);
 % Empirical from Welch
 [S_welch,w_welch]=estimateSpectrumWelch(y_sim,1/dt,'Nwelch',100,'unit','rad','plot','no');
 
-plotpsd(w_welch,S_welch,w_axis,S_y_ss_disc*2);
-
 plotopt=struct()
 plotopt.xlim=[0 100];
-plotopt.LineStyleSet={'-' '--' ':' '--'}
+plotopt.linestyle={'-' '--' ':' '--'}
 
 plotpsd(w_welch,S_welch,w_axis,S_y_ss_cont*2,w_axis,S_theory*2,plotopt);
 

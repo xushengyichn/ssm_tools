@@ -1,11 +1,9 @@
 function [Hpy Hx0y Hx1y]=JIS_tf(A,B,G,J,Q,R,S,dt,omega_axis)
 %% Transfer function for steady state operation of joint input and state estimator
 %
-% NOT VERIFIED YET
-%
 % Model
-% x(k+1)=A*x(k)+B*p(k)+w(k);
-% y=G*x(k)+J*p(k)+v(k);
+% x(k+1)=A*x(k)+B*p(k)+w(k)
+% y(k)=G*x(k)+J*p(k)+v(k)
 %
 % Inputs:
 % A: state matrix
@@ -16,13 +14,14 @@ function [Hpy Hx0y Hx1y]=JIS_tf(A,B,G,J,Q,R,S,dt,omega_axis)
 % R: output noise covariance
 % S: mixed noise covariance
 % dt: time step
-% omega_axis: 
+% omega_axis: frequency axis
 %
 % Outputs:
-% Hpy: matrix with TF, output-to-force
+% Hpy: matrix with TF, output-to-force estimate
 % Hx0y: matrix with TF, output-to-filter estimate
 % Hx1y: matrix with TF, output-to-prediction estimate
 %
+
 %%
 
 ns=size(A,1);
@@ -37,7 +36,6 @@ P0=[];
 
 %%
 
-
 M2=[M_ss ; L_ss ; zeros(ns,ny) ];
 
 for k=1:length(omega_axis)
@@ -46,7 +44,7 @@ for k=1:length(omega_axis)
         L_ss*J eye(ns) (-eye(ns)+L_ss*G);
         B A -exp(1i.*omega_axis(k)*dt)*eye(ns) ];
 
-    M3=eye(size(M1)) / M1 * M2;
+    M3=M1\M2;
 
     M4(:,:,k)=M3; %M4 is [Hpd;Hx0d;Hx1d]
 

@@ -1,4 +1,4 @@
-%%
+%% Verification of frequencies of fe beam vs analytic
 
 clc
 clear all
@@ -27,9 +27,7 @@ legend show
 figure(); hold on;
 
 for k=1:10
-    
    plot(mod.phi(1:2:end,k)); 
-   
 end
 
 tilefigs
