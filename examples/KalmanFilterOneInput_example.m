@@ -76,7 +76,7 @@ for k1=1:N
     x00=x(:,k1);
 end
 
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterOneInput(A,B,H,Q,R,z,u,x0,P_0_0);
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterOneInput(A,B,H,Q,R,z,u,x0,P_0_0,'steadystate',true);
 
 
 

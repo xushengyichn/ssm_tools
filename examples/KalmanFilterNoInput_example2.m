@@ -39,7 +39,7 @@ P_0_0=eye(2);
 
 
 dt = 0.01;
-T = 5;
+T = 100;
 t = 0:dt:T;
 A=[1 dt;0 1];
 H = [1 0];
@@ -60,7 +60,7 @@ for k1=1:N
     x00=x(:,k1);
 end
 
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0);
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0,'steadystate',true);
 % S = zeros(2,1);
 % y=z;
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilter(A,H,Q,R,S,y,x0,P_0_0);

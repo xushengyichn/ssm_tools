@@ -55,7 +55,7 @@ P_0_0=eye(2);
 x0=[50;0];
 
 dt = 0.01;
-T = 25;
+T = 100;
 t = 0:dt:T;
 
 [A, B, H, ~ ,~]=ssmod_c2d(Ac,Bc,Hc,[],dt);
@@ -75,7 +75,8 @@ for k1=1:N
     x00=x(:,k1);
 end
 
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0);
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0,'steadystate',true);
+% [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0,'steadystate',false);
 % S = zeros(2,1);
 % y=z;
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilter(A,H,Q,R,S,y,x0,P_0_0);

@@ -1,63 +1,151 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: ShengyiXu xushengyichn@outlook.com
 %Date: 2023-07-15 11:37:02
-%LastEditors: ShengyiXu xushengyichn@outlook.com
-%LastEditTime: 2023-07-15 14:03:28
+%LastEditors: xushengyichn xushengyichn@outlook.com
+%LastEditTime: 2023-08-12 12:28:47
 %FilePath: \ssm_tools\algorithm\KalmanFilterOneInput.m
-%Description: 
+%Description:
 %
-%Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
+%Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterOneInput(A,B,H,Q,R,z,u,x0,P_0_0)
+function [x_k_k, x_k_kmin, P_k_k, P_k_kmin] = KalmanFilterOneInput(A, B, H, Q, R, z, u, x0, P_0_0, varargin)
 
-%% Kalman filter
-%
-% Model:
-% x(k+1)=A*x(k)+B*u(k)+w(k);
-% z=H*x(k)+v(k);
-%
-% Inputs:
-% A: state matrix
-% B: input matrix
-% H: output matrix
-% Q: state noise covariance
-% R: output noise covariance
-% S: mixed noise covariance
-% z: output vector
-% u: input vector
-% x0: initial state estimate
-% P_0_0: initial state error covariance
-%
-% Outputs:
-% x_k_k: filter state estimate
-% x_k_kmin: prediction state estimate
-% P_k_k: filter error covariance
-% P_k_kmin: prediction error covariance
+    %% Kalman filter
+    %
+    % Model:
+    % x(k+1)=A*x(k)+B*u(k)+w(k);
+    % z=H*x(k)+v(k);
+    %
+    % Inputs:
+    % A: state matrix
+    % B: input matrix
+    % H: output matrix
+    % Q: state noise covariance
+    % R: output noise covariance
+    % S: mixed noise covariance
+    % z: output vector
+    % u: input vector
+    % x0: initial state estimate
+    % P_0_0: initial state error covariance
+    %
+    % Outputs:
+    % x_k_k: filter state estimate
+    % x_k_kmin: prediction state estimate
+    % P_k_k: filter error covariance
+    % P_k_kmin: prediction error covariance
 
-N = size(z,2);
-x=x0;
-for k1 =1:N
-    %% Prediction
-    x_=A*x+B*u(:,k1);
-    P_=A*P_0_0*A.'+Q;
+    %% Parse inputs
 
-    x_k_kmin(:,k1)=x_;
-    P_k_kmin(:,:,k1)=P_;
-    %% Correction
-    Kk=P_*H.'/(H*P_*H.'+R);
-    x=x_+Kk*(z(:,k1)-H*x_);
+    p = inputParser;
+    p.KeepUnmatched = true;
 
-    x_k_k(:,k1)=x;
-    %% Update
-    P_k=forcesym((eye(size(A))-Kk*H)*P_);
-    P_k_k(:,:,k1)=P_k;
+    addParameter(p, 'steadystate', true, @islogical)
+    addParameter(p, 'showtext', true, @islogical)
+    addParameter(p, 'noscaling', false, @islogical)
 
+    parse(p, varargin{1:end});
+
+    steadystate = p.Results.steadystate;
+    showtext = p.Results.showtext;
+    noscaling = p.Results.noscaling;
+
+    N = size(z, 2);
+    x = x0;
+    P_k = P_0_0;
+
+    %% Conventional
+    if steadystate == false
+        t0 = tic;
+
+        for k1 = 1:N
+            %% Prediction
+            x_ = A * x + B * u(:, k1);
+            P_ = A * P_k * A.' + Q;
+
+            x_k_kmin(:, k1) = x_;
+            P_k_kmin(:, :, k1) = P_;
+            %% Correction
+            Kk = P_ * H.' / (H * P_ * H.' + R);
+            x = x_ + Kk * (z(:, k1) - H * x_);
+
+            x_k_k(:, k1) = x;
+            %% Update
+            P_k = forcesym((eye(size(A)) - Kk * H) * P_);
+            P_k_k(:, :, k1) = P_k;
+
+        end
+
+        telapsed = toc(t0);
+    end
+
+    %% Steady state
+    if steadystate == true
+
+        if noscaling == true
+            [P_k_kmin_ss, ~, ~, info] = idare(A.', H.', Q, R, [], [], 'noscaling');
+        else
+            [P_k_kmin_ss, ~, ~, info] = idare(A.', H.', Q, R);
+        end
+
+        if info.Report ~= 0
+
+            if info.Report == 1
+                disp('***** DARE solution accuracy poor, running with scaling');
+                warning('***** DARE solution accuracy poor, running with scaling');
+            end
+
+            if info.Report == 2
+                warning('***** DARE solution not finite, running with scaling');
+            end
+
+            if info.Report == 3
+                warning('***** DARE solution not found, running with scaling');
+            end
+
+            [P_k_kmin_ss, ~, ~, info] = idare(A.', H.', Q, R);
+
+        end
+
+        if info.Report == 1
+            disp('***** DARE solution accuracy poor');
+            warning('***** DARE solution accuracy poor');
+        elseif info.Report == 2
+            error('DARE solution not finite');
+        elseif info.Report == 3
+            error('DARE solution not found');
+        end
+
+        P_k_kmin_ss = forcesym(P_k_kmin_ss);
+        Kk_ss = P_k_kmin_ss * H.' / (H * P_k_kmin_ss * H.' + R);
+        t0 = tic;
+
+        for k1 = 1:N
+            %% Prediction
+            x_ = A * x + B * u(:, k1);
+
+            x_k_kmin(:, k1) = x_;
+            %% Correction
+            x = x_ + Kk_ss * (z(:, k1) - H * x_);
+
+            x_k_k(:, k1) = x;
+            %% Update
+
+        end
+
+        P_k_kmin = [];
+        P_k_k = [];
+        telapsed = toc(t0);
+
+    end
+
+    if showtext == true
+        disp(['Kalman filter calculated in ' sprintf('%2.1f', telapsed) ' seconds, ' sprintf('%2.1f', telapsed * 10 ^ 5 ./ N) ' seconds per 1M steps']);
+    end
+
+    %% Other functions
 end
-end
-%% Other functions
+    function B = forcesym(A)
 
-function B=forcesym(A)
+        B = (A + A.') / 2;
 
-B=(A+A.')/2;
-
-end
+    end
