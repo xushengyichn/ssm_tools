@@ -1,9 +1,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: ShengyiXu xushengyichn@outlook.com
 %Date: 2023-07-15 11:37:02
-%LastEditors: ShengyiXu xushengyichn@outlook.com
-%LastEditTime: 2023-07-15 11:38:11
-%FilePath: \ssm_tools\examples\KalmanFilterNoInput_example.m
+%LastEditors: xushengyichn xushengyichn@outlook.com
+%LastEditTime: 2023-08-13 11:06:06
+%FilePath: \ssm_tools\examples\steadystate_conventional_compare.m
 %Description: track the state of a spring-mass system with Kalman filter
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
@@ -55,7 +55,7 @@ P_0_0=eye(2);
 x0=[50;0];
 
 dt = 0.01;
-T = 25;
+T = 100;
 t = 0:dt:T;
 
 [A, B, H, ~ ,~]=ssmod_c2d(Ac,Bc,Hc,[],dt);
@@ -76,30 +76,34 @@ for k1=1:N
 end
 
 [x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0,'steadystate',false);
-% S = zeros(2,1);
-% y=z;
-% [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilter(A,H,Q,R,S,y,x0,P_0_0);
-[x_k_N,P_k_N]=RTSFixedInterval(A,x_k_k,x_k_kmin,P_k_k,P_k_kmin);
+[x_k_k_s,x_k_kmin_s,P_k_k_s,P_k_kmin_s]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0,'steadystate',true);
+
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
-
-
 plot(t, z(1,:),  'Color', 'g','LineWidth', lineWidthNormal);
 hold on
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthNormal);
 plot(t, x_k_k(1,:),  'Color', 'b','LineWidth', lineWidthNormal,'LineStyle','-.');
-plot(t, x_k_N(1,:),  'Color', 'cyan','LineWidth', lineWidthNormal,'LineStyle','--');
 xlabel('time (s)')
 ylabel('displacement (m)')
-legend('measure','real','filter','smoothing')
+legend('measure','real','filter')
 
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
-plot(t,squeeze(P_k_k(1,1,:)), 'Color', 'b','LineWidth', lineWidthNormal)
+plot(t, squeeze(P_k_k(2,2,:)),  'Color', 'g','LineWidth', lineWidthNormal);
 hold on
-plot(t,squeeze(P_k_N(1,1,:)), 'Color', 'cyan','LineWidth', lineWidthNormal)
-legend('filter','smoothing')
+plot(t, squeeze(P_k_k_s(2,2,:)),  'Color', 'r','LineWidth', lineWidthNormal);
 xlabel('time (s)')
-ylabel('covariance')
+ylabel('variance')
+legend('Conventional','Steady-state')
+
+[figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
+plot(t, x_k_k(1,:),  'Color', 'g','LineWidth', lineWidthNormal);
+hold on
+plot(t, x_k_k_s(1,:),  'Color', 'r','LineWidth', lineWidthNormal,'LineStyle','-.');
+xlabel('time (s)')
+ylabel('displacement (m)')
+legend('Conventional','Steady-state')
+
 
 function [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images)
     figureIdx=figureIdx+1;

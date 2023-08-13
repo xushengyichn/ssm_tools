@@ -136,8 +136,9 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin] = KalmanFilterNoInput(A, H, Q, R, z,
             % P_k_k(:, :, k1) = P_k_kmin_ss;
 
         end
-        P_k_kmin=[];
-        P_k_k=[];
+        [m, n] = size(P_k_kmin_ss);  % 获取P_k_kmin_ss的尺寸
+        P_k_kmin=repmat(P_k_kmin_ss, [1, 1, N]);
+        P_k_k=P_k_kmin;
         telapsed = toc(t0);
 
     end

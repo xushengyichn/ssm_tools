@@ -87,7 +87,7 @@ p_det=u;
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilterWithInput(A,B,H,J,Q,R,S,y,p_det,x0,P_0_0,'nx',2);
 p=u;
 G=H;
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInput_shengyi(A,B,G,J,Q,R,y,p,x0,P_0_0)
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterWithInput_shengyi(A,B,G,J,Q,R,y,p,x0,P_0_0);
 
 %% plot
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);

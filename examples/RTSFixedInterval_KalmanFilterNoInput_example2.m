@@ -24,7 +24,7 @@ run('InitScript.m');
 
 %% 0 绘图参数
 fig_bool = ON;
-num_figs_in_row = 3; %每一行显示几个图
+num_figs_in_row = 4; %每一行显示几个图
 figPos = figPosSmall; %图的大小，参数基于InitScript.m中的设置
 %设置图片间隔
 gap_between_images = [0,0];
@@ -60,12 +60,13 @@ for k1=1:N
     x00=x(:,k1);
 end
 
-[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0);
+[x_k_k,x_k_kmin,P_k_k,P_k_kmin]=KalmanFilterNoInput(A,H,Q,R,z,x0,P_0_0,'steadystate',true);
 % S = zeros(2,1);
 % y=z;
 % [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KalmanFilter(A,H,Q,R,S,y,x0,P_0_0);
-[x_k_N,P_k_N]=RTSFixedInterval(A,x_k_k,x_k_kmin,P_k_k,P_k_kmin);
-%% plot
+% [x_k_N,P_k_N]=RTSFixedInterval(A,x_k_k,x_k_kmin,P_k_k,P_k_kmin);
+[x_k_N,P_k_N,P_klag_N]=RTSSmoother(A,x_k_k,x_k_kmin,P_k_k(:,:,1),P_k_kmin(:,:,1),'steadystate',true);
+%% plot,
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 
 plot(t, x(1,:),  'Color', 'r','LineWidth', lineWidthThin);
@@ -96,7 +97,7 @@ legend('measure')
 [figureIdx,figPos_temp] = create_figure(figureIdx, num_figs_in_row,figPos,gap_between_images);
 plot(t,squeeze(P_k_k(1,1,:)), 'Color', 'b','LineWidth', lineWidthNormal)
 hold on
-plot(t,squeeze(P_k_N(1,1,:)), 'Color', 'cyan','LineWidth', lineWidthNormal)
+plot(t,squeeze(P_k_N(1,1,:)), 'Color', 'cyan','LineWidth', lineWidthNormal,'LineStyle','-')
 legend('filter','smoothing')
 xlabel('time (s)')
 ylabel('covariance')

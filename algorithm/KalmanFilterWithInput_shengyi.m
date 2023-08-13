@@ -2,7 +2,7 @@
 %Author: ShengyiXu xushengyichn@outlook.com
 %Date: 2023-07-15 12:44:21
 %LastEditors: xushengyichn xushengyichn@outlook.com
-%LastEditTime: 2023-08-12 13:32:23
+%LastEditTime: 2023-08-13 10:52:35
 %FilePath: \ssm_tools\algorithm\KalmanFilterWithInput_shengyi.m
 %Description: 
 %
@@ -137,8 +137,9 @@ end
             %% Update
     
         end
-        P_k_kmin=[];
-        P_k_k=[];
+        [m, n] = size(P_k_kmin_ss);  % 获取P_k_kmin_ss的尺寸
+        P_k_kmin=repmat(P_k_kmin_ss, [1, 1, N]);
+        P_k_k=P_k_kmin;
         telapsed = toc(t0);
     end
     if showtext == true
