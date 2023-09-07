@@ -1,14 +1,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Author: xushengyichn xushengyichn@outlook.com
 %Date: 2023-07-19 23:19:38
-%LastEditors: xushengyichn xushengyichn@outlook.com
-%LastEditTime: 2023-08-12 12:07:21
+%LastEditors: ShengyiXu xushengyichn@outlook.com
+%LastEditTime: 2023-09-07 20:13:44
 %FilePath: \ssm_tools\algorithm\KalmanFilterNoInput.m
 %Description:
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [x_k_k, x_k_kmin, P_k_k, P_k_kmin] = KalmanFilterNoInput(A, H, Q, R, z, x0, P_0_0, varargin)
+function [x_k_k, x_k_kmin, P_k_k, P_k_kmin,result] = KalmanFilterNoInput(A, H, Q, R, z, x0, P_0_0, varargin)
 
     %% Kalman filter
     %
@@ -40,17 +40,25 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin] = KalmanFilterNoInput(A, H, Q, R, z,
     addParameter(p, 'steadystate', true, @islogical)
     addParameter(p, 'showtext', true, @islogical)
     addParameter(p, 'noscaling', false, @islogical)
+    addParameter(p, 'debugstate', false, @islogical)
+
 
     parse(p, varargin{1:end});
 
     steadystate = p.Results.steadystate;
     showtext = p.Results.showtext;
     noscaling = p.Results.noscaling;
+    debugstate = p.Results.debugstate;
 
     N = size(z, 2);
     x = x0;
     P_k = P_0_0;
 
+    if debugstate == true
+    logL = 0; % log marginal likelihood reference as equation (48) in Petersen et al. (2022)
+    logSk = 0; % log marginal likelihood reference as equation (48) in Petersen et al. (2022)
+    logek = 0; % log marginal likelihood reference as equation (48) in Petersen et al. (2022)
+    end
     %% Conventional
     if steadystate == false
         t0 = tic;
@@ -135,6 +143,31 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin] = KalmanFilterNoInput(A, H, Q, R, z,
             % P_k = forcesym((eye(size(A)) - Kk * H) * P_);
             % P_k_k(:, :, k1) = P_k_kmin_ss;
 
+            %% Calculate log marginal likelihood reference as equation (48) in Petersen et al. (2022)
+            % @article{Petersen2022,
+            % title = {Wind Load Estimation and Virtual Sensing in Long-Span Suspension Bridges Using Physics-Informed Gaussian Process Latent Force Models},
+            % author = {Petersen, {\O}. W. and {\O}iseth, O. and Lourens, E.},
+            % year = {2022},
+            % month = may,
+            % journal = {Mechanical Systems and Signal Processing},
+            % volume = {170},
+            % pages = {108742},
+            % issn = {0888-3270},
+            % doi = {10.1016/j.ymssp.2021.108742},
+            % urldate = {2023-06-23},
+            % langid = {english}
+            % }
+            if debugstate == true
+            Sk = H * P_k_kmin_ss * H.' + R;
+            ek = z(:, k1) - H * x_;
+            logL_i = -0.5*(log(det(Sk))+ek.'*inv(Sk)*ek); 
+            logSk_i = -0.5*log(det(Sk));
+            logek_i = -0.5*ek.'*inv(Sk)*ek;
+            logSk = logSk + logSk_i;
+            logek = logek + logek_i;
+            logL = logL + logL_i;
+            end
+
         end
         [m, n] = size(P_k_kmin_ss);  % 获取P_k_kmin_ss的尺寸
         P_k_kmin=repmat(P_k_kmin_ss, [1, 1, N]);
@@ -145,6 +178,17 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin] = KalmanFilterNoInput(A, H, Q, R, z,
     if showtext == true
         disp(['Kalman filter calculated in ' sprintf('%2.1f', telapsed) ' seconds, ' sprintf('%2.1f', telapsed * 10 ^ 5 ./ N) ' seconds per 1M steps']);
     end
+    if debugstate == true
+    result.logL = logL;
+    result.logSk = logSk;
+    result.logek = logek;
+    else 
+    result.logL = [];
+    result.logSk = [];
+    result.logek = [];
+    end
+
+
 end
 
 %% Other functions
