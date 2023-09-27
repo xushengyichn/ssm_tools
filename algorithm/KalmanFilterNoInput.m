@@ -128,6 +128,11 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin,result] = KalmanFilterNoInput(A, H, Q
         Kk_ss = P_k_kmin_ss * H.' / (H * P_k_kmin_ss * H.' + R);
         t0 = tic;
 
+        if debugstate == true
+        Sk = H * P_k_kmin_ss * H.' + R;
+        invSk = inv(Sk);
+        detSk = det(Sk);
+        end
         for k1 = 1:N
             %% Prediction
             x_ = A * x;
@@ -158,11 +163,11 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin,result] = KalmanFilterNoInput(A, H, Q
             % langid = {english}
             % }
             if debugstate == true
-            Sk = H * P_k_kmin_ss * H.' + R;
+            
             ek = z(:, k1) - H * x_;
-            logL_i = -0.5*(log(det(Sk))+ek.'*inv(Sk)*ek); 
-            logSk_i = -0.5*log(det(Sk));
-            logek_i = -0.5*ek.'*inv(Sk)*ek;
+            logL_i = -0.5*(log(detSk)+ek.'*invSk*ek); 
+            logSk_i = -0.5*log(detSk);
+            logek_i = -0.5*ek.'*invSk*ek;
             logSk = logSk + logSk_i;
             logek = logek + logek_i;
             logL = logL + logL_i;
@@ -170,7 +175,8 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin,result] = KalmanFilterNoInput(A, H, Q
 
         end
         [m, n] = size(P_k_kmin_ss);  % 获取P_k_kmin_ss的尺寸
-        P_k_kmin=repmat(P_k_kmin_ss, [1, 1, N]);
+        % P_k_kmin=repmat(P_k_kmin_ss, [1, 1, N]);
+        P_k_kmin=P_k_kmin_ss;
         P_k_k=P_k_kmin;
         telapsed = toc(t0);
 
