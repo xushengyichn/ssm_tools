@@ -2,8 +2,8 @@
 %Author: xushengyichn xushengyichn@outlook.com
 %Date: 2023-07-19 23:19:38
 %LastEditors: ShengyiXu xushengyichn@outlook.com
-%LastEditTime: 2023-09-07 20:13:44
-%FilePath: \ssm_tools\algorithm\KalmanFilterNoInput.m
+%LastEditTime: 2023-10-23 23:27:50
+%FilePath: \Exercises-for-Techniques-for-estimation-in-dynamics-systemsf:\git\ssm_tools\algorithm\KalmanFilterNoInput.m
 %Description:
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved.
@@ -188,10 +188,12 @@ function [x_k_k, x_k_kmin, P_k_k, P_k_kmin,result] = KalmanFilterNoInput(A, H, Q
     result.logL = logL;
     result.logSk = logSk;
     result.logek = logek;
+    result.invSk = invSk;
     else 
     result.logL = [];
     result.logSk = [];
     result.logek = [];
+    result.invSk = [];
     end
 
 
