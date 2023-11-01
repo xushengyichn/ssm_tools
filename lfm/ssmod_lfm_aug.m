@@ -1,3 +1,13 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Author: ShengyiXu xushengyichn@outlook.com
+%Date: 2023-11-01 23:10:34
+%LastEditors: ShengyiXu xushengyichn@outlook.com
+%LastEditTime: 2023-11-01 23:14:32
+%FilePath: \Exercises-for-Techniques-for-estimation-in-dynamics-systemsf:\git\ssm_tools\lfm\ssmod_lfm_aug.m
+%Description: 
+%
+%Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [Fac,Bac,Hac,Jac,Fad,Bad,Had,Jad,Qad]=ssmod_lfm_aug(Ac,Bc,Gc,Jc,Fc,Hc,Lc,Qxd,sigma_w,dt)
 
 %% Augmented model with modal states and latent states
@@ -43,7 +53,16 @@ ns2=size(Fc,1);
 
 nw=size(Lc,2);
 
-Sigma_w_squared=diag(sigma_w).^2;
+
+if isvector(sigma_w)
+    Sigma_w_squared=diag(sigma_w).^2;
+elseif ismatrix(sigma_w)
+    Sigma_w_squared=sigma_w.^2;
+else
+    Sigma_w_squared=sigma_w.^2;
+end
+
+
 
 Qwc=Lc*Sigma_w_squared*Lc.';
 Qxc=zeros(ns);
@@ -65,7 +84,12 @@ if isempty(Qxd)
 end
 
 
-Qad=Qd+Qxd;
+if isempty(Qxd)
+    Qxd=zeros(size(Qd));
+end
+
+
+Qad=Qd+blkdiag(Qxd,zeros(size(Qwc)));
 
 Qad=(Qad+Qad.')/2;
 
