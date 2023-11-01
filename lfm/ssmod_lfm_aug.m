@@ -1,3 +1,13 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Author: ShengyiXu xushengyichn@outlook.com
+%Date: 2023-11-01 23:10:34
+%LastEditors: ShengyiXu xushengyichn@outlook.com
+%LastEditTime: 2023-11-01 23:14:32
+%FilePath: \Exercises-for-Techniques-for-estimation-in-dynamics-systemsf:\git\ssm_tools\lfm\ssmod_lfm_aug.m
+%Description: 
+%
+%Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function [Fac,Bac,Hac,Jac,Fad,Bad,Had,Jad,Qad]=ssmod_lfm_aug(Ac,Bc,Gc,Jc,Fc,Hc,Lc,Qxd,sigma_w,dt)
 
 %% Augmented model with modal states and latent states
@@ -68,6 +78,16 @@ Bac=[Bc ; zeros(size(Fc,1),size(Bc,2))];
 Jac=Jc;
 
 Qd=cov_c2d(Fac,Qac,dt);
+
+if isempty(Qxd)
+    Qxd=zeros(size(Qd));
+end
+
+
+if isempty(Qxd)
+    Qxd=zeros(size(Qd));
+end
+
 
 Qad=Qd+blkdiag(Qxd,zeros(size(Qwc)));
 
