@@ -8,7 +8,7 @@
 %
 %Copyright (c) 2023 by ${git_name_email}, All Rights Reserved. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [Fac,Bac,Gac,Jac,Fad,Bad,Had,Jad,Qad]=ssmod_lfm_aug_matern_and_quasiperiod(Ac,Bc,Gc,Jc,Fc,Hc,Lc,Ec,Tc,Kc,Qxd,sigma_w,sigma_z,dt)
+function [Fac,Bac,Gac,Jac,Fad,Bad,Gad,Jad,Qad]=ssmod_lfm_aug_matern_and_quasiperiod(Ac,Bc,Gc,Jc,Fc,Hc,Lc,Ec,Tc,Kc,Qxd,sigma_w,sigma_z,dt)
 
 %% Augmented model with modal states and latent states
 %
@@ -44,11 +44,11 @@ function [Fac,Bac,Gac,Jac,Fad,Bad,Had,Jad,Qad]=ssmod_lfm_aug_matern_and_quasiper
 % Outputs:
 % Fac: augmented state matrix (cont)
 % Bac: 
-% Hac: augmented output matrix (cont)
+% Gac: augmented output matrix (cont)
 % Jac:
 % Fad: augmented state matrix (disc)
 % Bad: 
-% Had: augmented output matrix (disc)
+% Gad: augmented output matrix (disc)
 % Jad:
 % Qad: augmented covariance (disc)
 %
@@ -101,5 +101,5 @@ Qad=Qd+blkdiag(Qxd,zeros(size(Qwc,1)+size(Qzc,1),size(Qwc,2)+size(Qzc,2)));
 
 Qad=(Qad+Qad.')/2;
 
-[Fad,Bad,Had,Jad]=ssmod_c2d(Fac,Bac,Gac,Jac,dt);
+[Fad,Bad,Gad,Jad]=ssmod_c2d(Fac,Bac,Gac,Jac,dt);
 
