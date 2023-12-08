@@ -65,9 +65,13 @@ end
 
 
 Qwc=Lc*Sigma_w_squared*Lc.';
-Qxc=zeros(ns);
+Qwd = Qwc*dt;
+% Qxc=zeros(ns);
+% Qxd = zeros(ns)*dt;
 
-Qac=blkdiag(Qxc,Qwc);
+
+
+% Qac=blkdiag(Qxc,Qwc);
 
 Fac=[Ac Bc*Hc ; zeros(ns2,ns) Fc];
 
@@ -77,19 +81,19 @@ Bac=[Bc ; zeros(size(Fc,1),size(Bc,2))];
 
 Jac=Jc;
 
-Qd=cov_c2d(Fac,Qac,dt);
+% Qd=cov_c2d(Fac,Qac,dt);
+% 
+% if isempty(Qxd)
+%     Qxd=zeros(size(Qd));
+% end
+% 
+% 
+% if isempty(Qxd)
+%     Qxd=zeros(size(Qd));
+% end
 
-if isempty(Qxd)
-    Qxd=zeros(size(Qd));
-end
 
-
-if isempty(Qxd)
-    Qxd=zeros(size(Qd));
-end
-
-
-Qad=Qd+blkdiag(Qxd,zeros(size(Qwc)));
+Qad=blkdiag(Qxd,Qwd);
 
 Qad=(Qad+Qad.')/2;
 
