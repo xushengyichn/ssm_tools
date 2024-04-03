@@ -1,4 +1,4 @@
-function [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss,M_k_ss,Omega_k_ss]=KF(A,B,G,J,Q,R,S,y,p_det,x0,P01,varargin)
+function [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss,M_k_ss,Omega_k_ss,result]=KF(A,B,G,J,Q,R,S,y,p_det,x0,P01,varargin)
 
 %% Kalman filter with known input
 %
@@ -28,12 +28,14 @@ p.KeepUnmatched=true;
 addParameter(p,'steadystate',true,@islogical)
 addParameter(p,'showtext',true,@islogical)
 addParameter(p,'noscaling',false,@islogical)
+addParameter(p, 'debugstate', false, @islogical)
 
 parse(p,varargin{1:end});
 
 steadystate=p.Results.steadystate;
 showtext=p.Results.showtext;
 noscaling=p.Results.noscaling;
+debugstate = p.Results.debugstate;
 
 %% Zero matrices
 
@@ -199,6 +201,33 @@ if steadystate==true
     telapsed=toc(t0);
 
 end
+
+%% log likelihood
+if debugstate == true
+    logL =  0;
+    logSk = 0;
+    logek = 0;
+    Sk = G * P_k_kmin_ss * G' + R;
+    invSk = inv(Sk);
+    detSk = det(Sk);
+    for k = 1:nt
+        ek = e_k(:,k);
+        logL_i = -0.5*(log(detSk)+ek.'*invSk*ek);
+        logSk_i = -0.5*log(detSk);
+        logek_i = -0.5*ek.'*invSk*ek;
+        logSk =logSk + logSk_i;
+        logek = logek + logek_i;
+        logL = logL + logL_i;
+    end
+    result.logL = logL;
+    result.logSk = logSk;
+    result.logek = logek;
+    result.invSk = invSk;
+else
+    result = [];
+end
+
+
 %%
 
 if showtext==true
