@@ -36,7 +36,7 @@ addParameter(p,'showtext',true,@islogical)
 addParameter(p,'dispconv',true,@islogical)
 addParameter(p,'trunc',false,@islogical)
 addParameter(p,'scale',false,@islogical)
-addParameter(p,'minsteps',100,@isnumeric)
+addParameter(p,'minsteps',10,@isnumeric)
 addParameter(p,'maxsteps',100e3,@isnumeric)
 addParameter(p,'convtol',1e-6,@isnumeric)
 addParameter(p,'Bu',[],@isnumeric)
@@ -90,7 +90,13 @@ end
 
 % Initial covariance from KF 
 if isempty(P01) | P01==0
-    [~,~,~,P01]=KF(A,B,G,J,Q,R,S,zeros(ny,10),zeros(np,10),[],[],'noscaling',false,'showtext',false);
+    
+    q=1e6*eye(np);
+    Q_tmp=Q+B*q*B.';
+    R_tmp=R+J*q*J.';
+    S_tmp=S+B*q*J.';
+    
+    [~,~,~,P01]=KF(A,[],G,[],Q_tmp,R_tmp,S_tmp,zeros(ny,10),[],[],[],'noscaling',false,'showtext',false);
 end
 
 % Assign initial values
@@ -201,7 +207,7 @@ while convreached==false
         disp(['***** Step ' num2str(k,'%3.0f') ', ratio_trace_P ' num2str(ratio_trace_Px(k),'%0.3e') ', ratio_trace_Pp ' num2str(ratio_trace_Pp(k),'%0.3e')]);
     end
     
-    if k>minsteps & abs(ratio_trace_Px(k)) < convtol & abs(ratio_trace_Pp(k)) < convtol
+    if k>=minsteps & abs(ratio_trace_Px(k)) < convtol & abs(ratio_trace_Pp(k)) < convtol
         convreached=true;
         if dispconv
             disp(['Trace convergence reached, k=' num2str(k)]);

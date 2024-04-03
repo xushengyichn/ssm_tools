@@ -1,8 +1,9 @@
-function [Ad Bd Gd Jd Ac Bc Gc Jc F]=ssmod_modal(phi,omega,gamma,Sa,Sd,Sp,dt,varargin)
+function [Ad Bd Gd Jd Ac Bc Gc Jc F]=ssmod_modal2(Mg,phi,omega,gamma,Sa,Sd,Sp,dt,varargin)
 
 %% Impulse response function for state space model
 
 % Inputs:
+% Mg: generalized mass
 % phi: mode shape matrix
 % omega: natural frequency matrix with diagonal omega
 % gamma: damping matrix with diagonal 2*omega*xi
@@ -44,10 +45,10 @@ Sv=sparse(ny,size(phi,1));
 Ac=[zeros(nm,nm) eye(nm); -omega.^2 -gamma];
 
 if strcmpi(force,'modal')
-	TempTermForce=eye(nm);
+	TempTermForce=Mg\eye(nm);
     np=nm;
 elseif strcmpi(force,'disc')
-	TempTermForce=phi.'*Sp;
+	TempTermForce=Mg\phi.'*Sp;
 else
     error('Missing arguement (modal or disc)')
 end

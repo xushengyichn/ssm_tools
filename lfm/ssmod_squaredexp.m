@@ -1,4 +1,4 @@
-function [Fc,Lc,Hc,sigma_w,S_trunc]=ssmod_squaredexp(L,sigma_p,ns,w_axis)
+function [Fc,Lc,Hc,sigma_w,S_trunc]=ssmod_squaredexp(L,sigma_p,ns,omega_axis)
 
 %% State-space model approximation of SE kernel
 %
@@ -10,7 +10,7 @@ function [Fc,Lc,Hc,sigma_w,S_trunc]=ssmod_squaredexp(L,sigma_p,ns,w_axis)
 % L: length scale
 % sigma_p: magnitude factor
 % ns: state-space model order, N=ns+1 terms in Taylor series
-% w_axis: axis for spectral density
+% omega_axis: axis for spectral density
 %
 % Outputs:
 % Fc: state kernel matrix in state-space model
@@ -20,10 +20,10 @@ function [Fc,Lc,Hc,sigma_w,S_trunc]=ssmod_squaredexp(L,sigma_p,ns,w_axis)
 % S_trunc: two-sided PSD of approximated model
 %
 % CF for SE model:
-% Kappa(t)=sigma_p^2*exp(-0.5*t^2/L^2)
+% R(t)=sigma_p^2*exp(-0.5*t^2/L^2)
 %
 % PSD from the inverse Fourier transform:
-% S(w)=1/(2*pi) int Kappa(t) exp(-i*w*tau) dtau
+% S(w)=1/(2*pi) int R(t) exp(-i*w*tau) dtau
 % S(w)=sigma_p^2*L/sqrt(2*pi)*exp(-0.5*L^2*w^2)
 %
 %% Checks
@@ -97,9 +97,9 @@ Hc=zeros(1,n_state); Hc(1)=1;
 
 S_trunc=[];
 
-if ~isempty(w_axis)
+if ~isempty(omega_axis)
 	Coeff_PSD_even=A_coeff_even_trunc.*L.^Power_even_trunc; 
 	Coeff_PSD_all=[Coeff_PSD_even;zeros(size(Coeff_PSD_even))]; Coeff_PSD_all=Coeff_PSD_all(1:end-1);
 
-	S_trunc(1,1,:)=1./polyval(flip(Coeff_PSD_all),w_axis)*sigma_p^2*L/sqrt(2*pi);
+	S_trunc(1,1,:)=1./polyval(flip(Coeff_PSD_all),omega_axis)*sigma_p^2*L/sqrt(2*pi);
 end

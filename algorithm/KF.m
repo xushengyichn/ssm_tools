@@ -1,4 +1,4 @@
-function [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KF(A,B,G,J,Q,R,S,y,p_det,x0,P_0_0,varargin)
+function [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss,M_k_ss,Omega_k_ss]=KF(A,B,G,J,Q,R,S,y,p_det,x0,P01,varargin)
 
 %% Kalman filter with known input
 %
@@ -17,7 +17,7 @@ function [x_k_k,x_k_kmin,P_k_k,P_k_kmin,K_k_ss]=KF(A,B,G,J,Q,R,S,y,p_det,x0,P_0_
 % y: output vector
 % p_det: known (deterministic) input
 % x0: initial state estimate
-% P_0_0: initial state error covariance
+% P01: initial state error covariance
 %
 
 %% Parse inputs
@@ -72,8 +72,8 @@ e_k=zeros(ny,nt);
 trace_P_k_k=zeros(1,nt);
 delta_trace_P_k_k=zeros(1,nt);
 
-if isempty(P_0_0);
-    P_0_0=eye(nx);
+if isempty(P01)
+    P01=eye(nx);
 end
 
 %% Conventional
@@ -88,7 +88,7 @@ if steadystate==false
         %From prev
         if k==1
             x_hat_k_kmin(:,k)=x0;
-            P_k_kmin(:,:,k)=P_0_0;
+            P_k_kmin(:,:,k)=P01;
         end
 
         % Measurement update
@@ -177,7 +177,7 @@ if steadystate==true
     % end
 
     t0=tic;
-    Mat_precalc=(P_k_kmin_ss*G.')*Omega_k_ss_inv;
+    M_k_ss=(P_k_kmin_ss*G.')*Omega_k_ss_inv;
     for k=1:nt
 
         % Initial
@@ -188,11 +188,9 @@ if steadystate==true
         e_k(:,k)=y(:,k)-G*x_hat_k_kmin(:,k)-J*p(:,k);
 
         % Measurement update
-        %     x_hat_k_k(:,k)=x_hat_k_kmin(:,k)+Mat_precalc*(y(:,k)-H*x_hat_k_kmin(:,k));
-        x_hat_k_k(:,k)=x_hat_k_kmin(:,k)+Mat_precalc*e_k(:,k); %faster (skipping repeated calculations of e)
+        x_hat_k_k(:,k)=x_hat_k_kmin(:,k)+M_k_ss*e_k(:,k); %faster (skipping repeated calculations of e)
 
         % Time update
-        %     x_hat_k_kmin(:,k+1)=F*x_hat_k_kmin(:,k)+K_k_ss*(y(:,k)-H*x_hat_k_kmin(:,k));
         x_hat_k_kmin(:,k+1)=A*x_hat_k_kmin(:,k)+B*p(:,k)+K_k_ss*e_k(:,k); %faster (skipping repeated calculations of e)
 
     end
@@ -204,7 +202,7 @@ end
 %%
 
 if showtext==true
-    disp(['Kalman filter calculated in ' sprintf('%2.1f', telapsed) ' seconds, ' sprintf('%2.1f', telapsed*10^5./nt) ' seconds per 1M steps']);
+    disp(['Kalman filter calculated in ' sprintf('%2.1f', telapsed) ' seconds, ' sprintf('%2.1f', telapsed*10^6./nt) ' seconds per 1M steps']);
 end
 
 %% Output
